@@ -1,0 +1,11 @@
+fastapi[all]
+pydantic-settings
+pyjwt
+passlib
+google-auth
+sqlmodel
+sqlalchemy
+asyncpg
+psycopg2-binary
+gTTS
+faster-whisper

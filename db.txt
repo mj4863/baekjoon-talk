@@ -1,0 +1,3 @@
+DB name: capstone_design
+user: peter
+password: 1234
