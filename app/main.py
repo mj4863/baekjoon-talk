@@ -1,7 +1,6 @@
 # app/main.py
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.configuration import settings
@@ -30,9 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Static File 등록
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Router 등록하기
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
