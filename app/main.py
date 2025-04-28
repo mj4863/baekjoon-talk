@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.configuration import settings
-from app.routers import auth, chat, google_auth, test
+from app.routers import auth, chat, google_auth
 from app.db.database import init_db
 
 @asynccontextmanager
