@@ -18,9 +18,9 @@ app = FastAPI(
     description=settings.DESCRIPTION,
     summary="AI assistant for programming practice",
     openapi_tags=settings.TAGS_METADATA,
-    docs_url=None,
-    redoc_url=None,
-    openapi_url=None,
+    #docs_url=None,
+    #redoc_url=None,
+    #openapi_url=None,
     lifespan=lifespan,
 )
 
