@@ -61,7 +61,7 @@ async def login(
     # JWT Access Token 생성
     access_token = create_access_token(
         data={"sub": db_user.email},
-        expires_delta=dt.timedelta(minutes=30),
+        #expires_delta=dt.timedelta(minutes=30),
     )
 
     refresh_token = create_refresh_token(
