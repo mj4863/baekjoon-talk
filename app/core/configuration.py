@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # JWT Token 관련 내용들
     JWT_SECRET_KEY: str = Field(..., env="JWT_SECRET_KEY")
     JWT_ALGORITHM: str = Field(default="HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 # 1 Hours
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 1 Hours -> 1 Day
     ACCESS_TOKEN_REFRESH_MINUTES: int = 60 * 24 * 3 # 3 Day
 
     # OAuth Credentials (Google)
