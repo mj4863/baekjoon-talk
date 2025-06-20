@@ -1,22 +1,35 @@
 # app/db/database.py
 
-from sqlmodel import SQLModel, create_engine, Session
+from typing import AsyncGenerator
+from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.core.configuration import settings
+from app.models.conversation import Conversation
+from app.models.message import Message
+from app.models.user import User
+from app.models.friend import FriendRequest, Friend
+from app.models.user_keyword import UserKeyword
+from app.models.user_activity import UserActivity
+from app.models.code_analysis_request import CodeAnalysisRequest
 
 DATABASE_URL = (
-    f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
-    f"@{settings.POSTGRES_HOST}/{settings.POSTGRES_DB}"
+    f"postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
+    f"@{settings.POSTGRES_HOST}.singapore-postgres.render.com:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
 )
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=True)
+async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-def get_session():
-    with Session(engine) as session:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
         yield session
 
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
 
-# def init_db():
-#     with engine.begin() as connect:
-#         await connect.run_sync(SQLModel.metadata.create_all)
-def init_db():
-    SQLModel.metadata.create_all(engine)
+async def reset_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.drop_all)
+        await conn.run_sync(SQLModel.metadata.create_all)

@@ -2,6 +2,8 @@
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
+import pytz
+import datetime as dt
 
 class Settings(BaseSettings):
     """
@@ -29,15 +31,20 @@ class Settings(BaseSettings):
             "description": "Google을 통한 인증 관련"
         }
     ]
+    # Timezone 관련 내용들
+    TIMEZONE: str = "Asia/Seoul"
+    @property
+    def KST(self) -> dt.tzinfo:
+        return pytz.timezone(self.TIMEZONE)
 
     # JWT Token 관련 내용들
     JWT_SECRET_KEY: str = Field(..., env="JWT_SECRET_KEY")
     JWT_ALGORITHM: str = Field(default="HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 1 Hours -> 1 Day
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24# 1 Day
     ACCESS_TOKEN_REFRESH_MINUTES: int = 60 * 24 * 3 # 3 Day
 
     # OAuth Credentials (Google)
-    GOOGLE_CLIENT_ID: str | None = Field(default="", env="GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_ID: str | None = Field(default="31068809223-lkauufv46udblivod5ojqdu5fttbk03b.apps.googleusercontent.com", env="GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET: str | None = Field(default="", env="GOOGLE_CLIENT_SECRET")
 
     POSTGRES_USER: str = Field(default="", env="POSTGRES_USER")
@@ -46,6 +53,10 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = Field(default="", env="POSTGRES_HOST")
     POSTGRES_PORT: str = Field(default="", env="POSTGRES_PORT")
 
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+
+    LLM_API_KEY: str = Field(default="", env="LLM_API_KEY")
 
     class Config:
         # .env file을 사용할 때

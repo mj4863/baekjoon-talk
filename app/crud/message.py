@@ -1,15 +1,18 @@
 # app/crud/message.py
 
-from sqlmodel import select, Session
+import datetime as dt
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from app.models.message import Message
 from typing import Annotated
 from uuid import uuid4
+from app.core.configuration import settings
 
-def create_message(
-        session: Session,
+async def create_message(
+        session: AsyncSession,
         conv_id: str,
         sender: str,
-        content: str
+        content: str,
 ) -> Message:
     """
     Message 생성
@@ -20,43 +23,50 @@ def create_message(
     message = Message(
         id=str(uuid4()),
         conv_id=conv_id,
+        created_at=dt.datetime.now(settings.KST),
         sender=sender,
-        content=content
+        content=content,
     )
     session.add(message)
-    session.commit()
-    session.refresh(message)
+    await session.commit()
+    await session.refresh(message)
     return message
 
-def get_message(
-        session: Session,
+async def get_message(
+        session: AsyncSession,
         message_id: str
 ) -> Message | None:
     """
     Returns Message by Message ID
     """
     statement = select(Message).where(Message.id == message_id)
-    result = session.exec(statement)
+    result = await session.exec(statement)
     return result.first()
 
-def list_messages_by_conversation(
-        session: Session,
+async def list_messages_by_conversation(
+        session: AsyncSession,
         conv_id: str
 ) -> list[Message]:
     """
     Returns All messages of Conversation (conv_id)
     """
-    statement = select(Message).where(Message.conv_id == conv_id)
-    result = session.exec(statement)
+    statement = (
+        select(Message)
+        .where(Message.conv_id == conv_id)
+        .order_by(Message.created_at.asc())
+    )
+    #statement = select(Message).where(Message.conv_id == conv_id)
+    result = await session.exec(statement)
     return result.all()
 
-def delete_messages_by_conversation(
-        session: Session,
+async def delete_messages_by_conversation(
+        session: AsyncSession,
         conv_id: str
 ) -> None:
     statement = select(Message).where(Message.conv_id == conv_id)
-    messages = session.exec(statement).all()
+    result = await session.exec(statement)
+    messages = result.all()
     for msg in messages:
-        session.delete(msg)
+        await session.delete(msg)
     
-    session.commit()
+    await session.commit()
